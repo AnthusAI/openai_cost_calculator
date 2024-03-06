@@ -17,10 +17,8 @@ Or, better yet, continue pressuring OpenAI to provide a pricing API or some way 
 To install the OpenAI Cost Calculator, you need to have Python installed on your system. Then, you can install the package and its dependencies by running:
 
 ```bash
-pip install -r requirements.txt
+pip install git+https://github.com/Anth-us/openai_cost_calculator.git@main
 ```
-
-This command installs all the necessary dependencies, including `coverage` for code coverage analysis and `watchexec` for automatically rerunning tests during development.
 
 ## Usage
 

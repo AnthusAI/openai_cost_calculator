@@ -6,7 +6,6 @@ setup(
     py_modules=['openai_cost_calculator'],
     install_requires=[
         'coverage',
-        'watchexec',
     ],
 )
 
