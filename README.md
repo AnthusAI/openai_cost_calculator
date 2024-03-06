@@ -22,17 +22,28 @@ pip install git+https://github.com/Anth-us/openai_cost_calculator.git@main
 
 ## Usage
 
-To calculate the cost of using an OpenAI model, you can import and use the `calculate_cost` function from the `openai_cost_calculator` module. Here's an example:
+To calculate the cost of using an OpenAI model, you can import and use the `calculate_cost` function from the `openai_cost_calculator` module. This function returns a dictionary with detailed cost information, including the cost of input tokens, the cost of output tokens, and the total cost, all represented as `Decimal` objects for precise financial calculations. Here's how to use it:
+
 
 ```python
 from openai_cost_calculator import calculate_cost
 
-cost = calculate_cost(model_name='gpt-4-0125-preview', input_tokens=1000, output_tokens=500)
+# Calculate the cost
+cost_details = calculate_cost(model_name='gpt-4-0125-preview', input_tokens=1000, output_tokens=500)
 
-print(f"Total cost: {cost}")
+# Accessing the detailed cost information
+input_cost = cost_details['input_cost']
+output_cost = cost_details['output_cost']
+total_cost = cost_details['total_cost']
+
+# Print the cost details
+print(f"Input Cost: ${input_cost}")
+print(f"Output Cost: ${output_cost}")
+print(f"Total Cost: ${total_cost}")
 ```
 
-Replace `'gpt-4-0125-preview'` with the model you're using, and adjust `input_tokens` and `output_tokens` according to your usage.
+
+In this example, replace `'gpt-4-0125-preview'` with the model you're using, and adjust `input_tokens` and `output_tokens` according to your usage.
 
 ## Running Tests
 

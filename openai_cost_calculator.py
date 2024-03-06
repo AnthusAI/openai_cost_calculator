@@ -22,5 +22,12 @@ def calculate_cost(model_name=None, input_tokens=0, output_tokens=0):
 
     input_price = Decimal(pricing_info['input_price'])
     output_price = Decimal(pricing_info['output_price'])
-    total_cost = (Decimal(input_tokens) * input_price + Decimal(output_tokens) * output_price) / Decimal('1000000')
-    return total_cost
+    input_cost = (Decimal(input_tokens) * input_price) / Decimal('1000000')
+    output_cost = (Decimal(output_tokens) * output_price) / Decimal('1000000')
+    total_cost = input_cost + output_cost
+
+    return {
+        'input_cost': input_cost,
+        'output_cost': output_cost,
+        'total_cost': total_cost
+    }
