@@ -1,7 +1,7 @@
 from decimal import Decimal
 import unittest
-from openai_cost_calculator import calculate_cost
-from pricing_information import model_pricing
+from openai_cost_calculator.openai_cost_calculator import calculate_cost
+from openai_cost_calculator.pricing_information import model_pricing
 
 class TestOpenAICostCalculator(unittest.TestCase):
 

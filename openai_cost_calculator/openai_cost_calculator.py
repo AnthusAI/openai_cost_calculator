@@ -1,5 +1,5 @@
 from decimal import Decimal
-from pricing_information import model_pricing
+from openai_cost_calculator.pricing_information import model_pricing
 
 def calculate_cost(model_name=None, input_tokens=0, output_tokens=0):
     """
