@@ -8,6 +8,7 @@ model_pricing = {
     'gpt-4': {'input_price': 30.00, 'output_price': 60.00},
     'gpt-4-32k': {'input_price': 60.00, 'output_price': 120.00},
     'gpt-3.5-turbo-0125': {'input_price': 0.50, 'output_price': 1.50},
+    'gpt-3.5-turbo': {'input_price': 0.50, 'output_price': 1.50},
     'gpt-3.5-turbo-instruct': {'input_price': 1.50, 'output_price': 2.00},
     'gpt-3.5-turbo-1106': {'input_price': 1.00, 'output_price': 2.00},
     'gpt-3.5-turbo-0613': {'input_price': 1.50, 'output_price': 2.00},
@@ -15,5 +16,9 @@ model_pricing = {
     'gpt-3.5-turbo-0301': {'input_price': 1.50, 'output_price': 2.00},
     'gemini-1.5-flash-preview-0514': {'input_price': 0.50, 'output_price': 1.50},
     'claude-3-haiku-20240307-v1': {'input_price': 0.25, 'output_price': 1.25},
+    'anthropic.claude-3-haiku-20240307-v1:0': {'input_price': 0.25, 'output_price': 1.25},
+    'claude-3-5-sonnet-20240620-v1': {'input_price': 3.00, 'output_price': 15.00},
+    'anthropic.claude-3-5-sonnet-20240620-v1:0': {'input_price': 3.00, 'output_price': 15.00},
     'meta.llama3-8b-instruct-v1': {'input_price': 0.40, 'output_price': 0.60},
+    'gpt-4o-mini': {'input_price': 0.15, 'output_price': 1.00},
 }
