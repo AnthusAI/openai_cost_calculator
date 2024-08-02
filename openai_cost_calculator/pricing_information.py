@@ -20,5 +20,7 @@ model_pricing = {
     'claude-3-5-sonnet-20240620-v1': {'input_price': 3.00, 'output_price': 15.00},
     'anthropic.claude-3-5-sonnet-20240620-v1:0': {'input_price': 3.00, 'output_price': 15.00},
     'meta.llama3-8b-instruct-v1': {'input_price': 0.40, 'output_price': 0.60},
+    'meta.llama3-1-70b-instruct-v1:0': {'input_price': 2.65, 'output_price': 3.50},
+    'meta.llama3-1-8b-instruct-v1:0': {'input_price': 0.30, 'output_price': 0.60},
     'gpt-4o-mini': {'input_price': 0.15, 'output_price': 1.00},
 }
