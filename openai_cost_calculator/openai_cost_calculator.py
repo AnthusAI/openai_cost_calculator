@@ -22,14 +22,14 @@ def calculate_cost(model_name=None, input_tokens=0, output_tokens=0):
 
     logger.info(f"Calculating cost for model: {model_name}")
 
-    # Handle fine-tuned models
+    # For fine-tuned models, extract the base fine-tuned model name
     if model_name.startswith('ft:'):
-        base_model = model_name.split(':')[1]
-    else:
-        base_model = model_name
-
+        model_parts = model_name.split(':')
+        if len(model_parts) > 2:
+            model_name = f"ft:{model_parts[1]}"
+    logging.info(f"Model name after processing: {model_name}")
     # Try to match the model name
-    pricing_info = model_pricing.get(base_model)
+    pricing_info = model_pricing.get(model_name)
 
     if pricing_info is None:
         logger.error(f"No pricing information found for model: {model_name}")
