@@ -7,6 +7,8 @@ model_pricing = {
     'gpt-4-1106-vision-preview': {'input_price': 10.00, 'output_price': 30.00},
     'gpt-4': {'input_price': 30.00, 'output_price': 60.00},
     'gpt-4-32k': {'input_price': 60.00, 'output_price': 120.00},
+    'gpt-4o-mini': {'input_price': 0.15, 'output_price': 1.00},
+    'gpt-4o-mini-2024-07-18': {'input_price': 0.15, 'output_price': 0.60},
     'gpt-3.5-turbo-0125': {'input_price': 0.50, 'output_price': 1.50},
     'gpt-3.5-turbo': {'input_price': 0.50, 'output_price': 1.50},
     'gpt-3.5-turbo-instruct': {'input_price': 1.50, 'output_price': 2.00},
@@ -22,5 +24,4 @@ model_pricing = {
     'meta.llama3-8b-instruct-v1': {'input_price': 0.40, 'output_price': 0.60},
     'meta.llama3-1-70b-instruct-v1:0': {'input_price': 2.65, 'output_price': 3.50},
     'meta.llama3-1-8b-instruct-v1:0': {'input_price': 0.30, 'output_price': 0.60},
-    'gpt-4o-mini': {'input_price': 0.15, 'output_price': 1.00},
 }
