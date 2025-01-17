@@ -9,6 +9,7 @@ model_pricing = {
     'gpt-4-32k': {'input_price': 60.00, 'output_price': 120.00},
     'gpt-4o-mini': {'input_price': 0.15, 'output_price': 0.60},
     'gpt-4o': {'input_price': 2.50, 'output_price': 10.00},
+    'gpt-4o-2024-08-06': {'input_price': 2.50, 'output_price': 10.00},
     'gpt-4o-mini-2024-07-18': {'input_price': 0.15, 'output_price': 0.60},
     'ft:gpt-4o-mini-2024-07-18': {'input_price': 0.30, 'output_price': 1.20},
     'gpt-3.5-turbo-0125': {'input_price': 0.50, 'output_price': 1.50},
