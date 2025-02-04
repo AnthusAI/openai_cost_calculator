@@ -11,6 +11,7 @@ model_pricing = {
     'gpt-4o': {'input_price': 2.50, 'output_price': 10.00},
     'gpt-4o-2024-08-06': {'input_price': 2.50, 'output_price': 10.00},
     'gpt-4o-mini-2024-07-18': {'input_price': 0.15, 'output_price': 0.60},
+    'o3-mini-2025-01-31': {'input_price': 1.10, 'output_price': 4.40},
     'ft:gpt-4o-mini-2024-07-18': {'input_price': 0.30, 'output_price': 1.20},
     'gpt-3.5-turbo-0125': {'input_price': 0.50, 'output_price': 1.50},
     'gpt-3.5-turbo': {'input_price': 0.50, 'output_price': 1.50},
