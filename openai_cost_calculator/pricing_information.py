@@ -25,6 +25,7 @@ model_pricing = {
     'anthropic.claude-3-haiku-20240307-v1:0': {'input_price': 0.25, 'output_price': 1.25},
     'us.anthropic.claude-3-5-haiku-20241022-v1:0': {'input_price': 1.00, 'output_price': 5.00},
     'claude-3-5-sonnet-20240620-v1': {'input_price': 3.00, 'output_price': 15.00},
+    'claude-3-7-sonnet-20250219': {'input_price': 3.00, 'output_price': 15.00},
     'anthropic.claude-3-5-sonnet-20240620-v1:0': {'input_price': 3.00, 'output_price': 15.00},
     'meta.llama3-8b-instruct-v1': {'input_price': 0.40, 'output_price': 0.60},
     'meta.llama3-1-70b-instruct-v1:0': {'input_price': 2.65, 'output_price': 3.50},
