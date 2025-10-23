@@ -14,6 +14,7 @@ model_pricing = {
     'gpt-4.1-mini-2025-04-14': {'input_price': 0.40, 'output_price': 1.60},
     'gpt-4.1-mini': {'input_price': 0.40, 'output_price': 1.60},
     'gpt-5-mini': {'input_price': 0.25, 'output_price': 2.00},
+    'gpt-5': {'input_price': 1.25, 'output_price': 10.00},
     'gpt-5-mini-2025-08-07': {'input_price': 0.25, 'output_price': 2.00},
     'openai.gpt-oss-120b-1:0': {'input_price': 0.15, 'output_price': 0.60},
     'openai.gpt-oss-20b-1:0': {'input_price': 0.07, 'output_price': 0.30},
