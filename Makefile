@@ -1,12 +1,12 @@
 .PHONY: test coverage
 
 test:
-	python3 -m unittest discover -s . -p '*_test.py'
+	uv run -m unittest discover -s . -p '*_test.py'
 
 coverage:
-	coverage run -m unittest discover -s . -p '*_test.py'
-	coverage report -m
-	coverage html
+	uv run coverage run -m unittest discover -s . -p '*_test.py'
+	uv run coverage report -m
+	uv run coverage html
 
 watch:
-	watchexec --exts py "make test"
+	uv run watchexec --exts py "make test"
