@@ -29,6 +29,12 @@ class TestOpenAICostCalculator(unittest.TestCase):
         self.assertEqual(model_pricing['gpt-4-1106-preview']['output_price'], 30.00)
         self.assertEqual(model_pricing['gpt-4-1106-vision-preview']['input_price'], 10.00)
         self.assertEqual(model_pricing['gpt-4-1106-vision-preview']['output_price'], 30.00)
+        self.assertEqual(model_pricing['gpt-5.4']['input_price'], 2.50)
+        self.assertEqual(model_pricing['gpt-5.4']['output_price'], 15.00)
+        self.assertEqual(model_pricing['gpt-5.4-mini']['input_price'], 0.75)
+        self.assertEqual(model_pricing['gpt-5.4-mini']['output_price'], 4.50)
+        self.assertEqual(model_pricing['gpt-5.4-nano']['input_price'], 0.20)
+        self.assertEqual(model_pricing['gpt-5.4-nano']['output_price'], 1.25)
 
 if __name__ == '__main__':
     unittest.main()
