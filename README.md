@@ -65,6 +65,8 @@ This will generate a coverage report in both terminal and HTML format, allowing 
 
 Contributions to the OpenAI Cost Calculator are welcome, especially in keeping the pricing information up-to-date. As OpenAI updates their pricing, please help by submitting pull requests with the updated prices. This ensures that the tool remains accurate and useful for everyone. Feel free to also suggest improvements or add support for additional models.
 
+You can learn more [here](./CONTRIBUTING.md).
+
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
