@@ -4,10 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Determine the next release without committing, tagging, or publishing"
+        description: "Determine the next release without committing, tagging, or publishing. Ignored when publish_existing_version is set."
         required: true
         type: boolean
         default: true
+      publish_existing_version:
+        description: "Publish an existing release tag to CodeArtifact, for example 1.0.0. Leave empty for semantic-release."
+        required: false
+        type: string
+        default: ""
   push:
     branches:
       - main
@@ -43,6 +48,15 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.ANTHUSBOT_GH_TOKEN || github.token }}
 
+      - name: Select existing release tag
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_existing_version != ''
+        env:
+          PUBLISH_EXISTING_VERSION: ${{ inputs.publish_existing_version }}
+        run: |
+          version="${PUBLISH_EXISTING_VERSION#v}"
+          git fetch --force --tags
+          git checkout --detach "v${version}"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -56,6 +70,7 @@ jobs:
 
       - name: Release version
         id: release
+        if: github.event_name != 'workflow_dispatch' || inputs.publish_existing_version == ''
         uses: python-semantic-release/python-semantic-release@v10.6.1
         with:
           github_token: ${{ secrets.ANTHUSBOT_GH_TOKEN || github.token }}
@@ -71,21 +86,39 @@ jobs:
           verbosity: "1"
 
       - name: Stop when no release was created
-        if: steps.release.outputs.released != 'true'
+        if: >-
+          (github.event_name != 'workflow_dispatch' || inputs.publish_existing_version == '') &&
+          steps.release.outputs.released != 'true'
         run: echo "No semantic release was created."
 
+      - name: Plan CodeArtifact publish
+        id: publish
+        env:
+          EXISTING_VERSION: ${{ inputs.publish_existing_version || '' }}
+          RELEASED: ${{ steps.release.outputs.released || 'false' }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version || '' }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          if [ -n "$EXISTING_VERSION" ]; then
+            version="${EXISTING_VERSION#v}"
+            echo "do_publish=true" >> "$GITHUB_OUTPUT"
+            echo "version=${version}" >> "$GITHUB_OUTPUT"
+          elif [ "$RELEASED" = "true" ] && [ "$DRY_RUN" != "true" ]; then
+            echo "do_publish=true" >> "$GITHUB_OUTPUT"
+            echo "version=${RELEASE_VERSION}" >> "$GITHUB_OUTPUT"
+          else
+            echo "do_publish=false" >> "$GITHUB_OUTPUT"
+            echo "version=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install build and publish tools
-        if: >-
-          steps.release.outputs.released == 'true' &&
-          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        if: steps.publish.outputs.do_publish == 'true'
         run: python -m pip install build twine
 
       - name: Verify release version
-        if: >-
-          steps.release.outputs.released == 'true' &&
-          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        if: steps.publish.outputs.do_publish == 'true'
         env:
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_VERSION: ${{ steps.publish.outputs.version }}
         run: |
           python - <<'PY'
           import os
@@ -106,39 +139,34 @@ jobs:
           PY
 
       - name: Build package
-        if: >-
-          steps.release.outputs.released == 'true' &&
-          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        if: steps.publish.outputs.do_publish == 'true'
         run: |
           rm -rf dist
           python -m build
           python -m twine check dist/*
 
       - name: Verify CodeArtifact configuration
-        if: >-
-          steps.release.outputs.released == 'true' &&
-          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        if: steps.publish.outputs.do_publish == 'true'
+        env:
+          CODEARTIFACT_PUBLISH_ROLE_ARN: ${{ secrets.CODEARTIFACT_PUBLISH_ROLE_ARN }}
         run: |
           test -n "$AWS_REGION"
           test -n "$CODEARTIFACT_DOMAIN"
           test -n "$CODEARTIFACT_DOMAIN_OWNER"
           test -n "$CODEARTIFACT_REPOSITORY"
+          test -n "$CODEARTIFACT_PUBLISH_ROLE_ARN"
 
       - name: Configure AWS credentials
-        if: >-
-          steps.release.outputs.released == 'true' &&
-          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        if: steps.publish.outputs.do_publish == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.CODEARTIFACT_PUBLISH_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Publish to CodeArtifact
-        if: >-
-          steps.release.outputs.released == 'true' &&
-          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        if: steps.publish.outputs.do_publish == 'true'
         env:
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_VERSION: ${{ steps.publish.outputs.version }}
         run: |
           aws codeartifact login \
             --tool twine \
