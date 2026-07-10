@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.semantic_release]
+version_source = "tag"
+version_variables = ["openai_cost_calculator/_version.py:__version__"]
+commit_message = "chore: release {version}"
+major_on_zero = false
+tag_format = "v{version}"
+changelog_file = "CHANGELOG.md"
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false

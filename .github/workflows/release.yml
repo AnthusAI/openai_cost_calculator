@@ -1,0 +1,165 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Determine the next release without committing, tagging, or publishing"
+        required: true
+        type: boolean
+        default: true
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ${{ vars.CODEARTIFACT_AWS_REGION }}
+  CODEARTIFACT_DOMAIN: ${{ vars.CODEARTIFACT_DOMAIN }}
+  CODEARTIFACT_DOMAIN_OWNER: ${{ vars.CODEARTIFACT_DOMAIN_OWNER }}
+  CODEARTIFACT_REPOSITORY: ${{ vars.CODEARTIFACT_REPOSITORY }}
+  CODEARTIFACT_PACKAGE_NAME: openai-cost-calculator
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  release:
+    name: Semantic Release and CodeArtifact Publish
+    runs-on: ubuntu-latest
+    if: >-
+      github.ref_name == 'main' &&
+      (github.event_name == 'workflow_dispatch' || github.actor != 'anthusbot')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ANTHUSBOT_GH_TOKEN || github.token }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install test tools
+        run: python -m pip install --upgrade pip
+
+      - name: Run unit tests
+        run: python -m unittest discover -s . -p '*_test.py'
+
+      - name: Release version
+        id: release
+        uses: python-semantic-release/python-semantic-release@v10.6.1
+        with:
+          github_token: ${{ secrets.ANTHUSBOT_GH_TOKEN || github.token }}
+          git_committer_name: anthusbot
+          git_committer_email: anthusbot@users.noreply.github.com
+          no_operation_mode: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+          build: "false"
+          commit: "true"
+          tag: "true"
+          push: "true"
+          changelog: "true"
+          vcs_release: "true"
+          verbosity: "1"
+
+      - name: Stop when no release was created
+        if: steps.release.outputs.released != 'true'
+        run: echo "No semantic release was created."
+
+      - name: Install build and publish tools
+        if: >-
+          steps.release.outputs.released == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        run: python -m pip install build twine
+
+      - name: Verify release version
+        if: >-
+          steps.release.outputs.released == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import runpy
+
+          version_globals = runpy.run_path(
+              Path("openai_cost_calculator") / "_version.py"
+          )
+          package_version = version_globals["__version__"]
+          release_version = os.environ["RELEASE_VERSION"]
+          if package_version != release_version:
+              raise SystemExit(
+                  f"package version {package_version} does not match "
+                  f"semantic-release output {release_version}"
+              )
+          print(f"Verified openai_cost_calculator release version {release_version}")
+          PY
+
+      - name: Build package
+        if: >-
+          steps.release.outputs.released == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        run: |
+          rm -rf dist
+          python -m build
+          python -m twine check dist/*
+
+      - name: Verify CodeArtifact configuration
+        if: >-
+          steps.release.outputs.released == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        run: |
+          test -n "$AWS_REGION"
+          test -n "$CODEARTIFACT_DOMAIN"
+          test -n "$CODEARTIFACT_DOMAIN_OWNER"
+          test -n "$CODEARTIFACT_REPOSITORY"
+
+      - name: Configure AWS credentials
+        if: >-
+          steps.release.outputs.released == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CODEARTIFACT_PUBLISH_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Publish to CodeArtifact
+        if: >-
+          steps.release.outputs.released == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          aws codeartifact login \
+            --tool twine \
+            --domain "$CODEARTIFACT_DOMAIN" \
+            --domain-owner "$CODEARTIFACT_DOMAIN_OWNER" \
+            --repository "$CODEARTIFACT_REPOSITORY"
+
+          twine upload --repository codeartifact dist/*
+
+          published_version="$(
+            aws codeartifact list-package-versions \
+              --domain "$CODEARTIFACT_DOMAIN" \
+              --domain-owner "$CODEARTIFACT_DOMAIN_OWNER" \
+              --repository "$CODEARTIFACT_REPOSITORY" \
+              --format pypi \
+              --package "$CODEARTIFACT_PACKAGE_NAME" \
+              --query "versions[?version=='${RELEASE_VERSION}'].version | [0]" \
+              --output text
+          )"
+
+          if [ "$published_version" != "$RELEASE_VERSION" ]; then
+            echo "CodeArtifact did not return ${CODEARTIFACT_PACKAGE_NAME} version ${RELEASE_VERSION}" >&2
+            exit 1
+          fi

@@ -17,7 +17,14 @@ Or, better yet, continue pressuring OpenAI to provide a pricing API or some way 
 To install the OpenAI Cost Calculator, you need to have Python installed on your system. Then, you can install the package and its dependencies by running:
 
 ```bash
-pip install git+https://github.com/Anth-us/openai_cost_calculator.git@main
+aws codeartifact login \
+  --tool pip \
+  --domain <domain> \
+  --domain-owner <aws-account-id> \
+  --repository <repository> \
+  --region <region>
+
+pip install openai-cost-calculator
 ```
 
 ## Usage
