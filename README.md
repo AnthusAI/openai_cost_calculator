@@ -75,3 +75,7 @@ Contributions to the OpenAI Cost Calculator are welcome, especially in keeping t
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
+
+---
+
+An experiment from [Anthus AI Solutions](https://anth.us).
